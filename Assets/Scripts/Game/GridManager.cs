@@ -7,8 +7,10 @@ using TMPro;
 
 public class GridManager : MonoBehaviour
 {
-    public int gridWidth = 7;
-    public int gridHeight = 5;
+    private int gridWidth;
+    private int gridHeight;
+    private int maxAllowed;
+
     public GameObject slotPrefab;  // empty slot placeholder (Image, can be invisible)
     public GameObject cardPrefab;  // the actual card prefab
     public Transform gridParent;
@@ -28,7 +30,7 @@ public class GridManager : MonoBehaviour
 
     //GAME OVER
     public SceneSwitcher sceneSwitcher;
-    public GameObject gameOverText;
+    public GameObject gameOverPanel;
 
     private Coroutine spawnRoutine;
     private bool isPaused = false;
@@ -62,11 +64,20 @@ public class GridManager : MonoBehaviour
             { (CardType.JackBox, CardVariant.box), cardSprites[9] },
             { (CardType.BlocksB, CardVariant.toy), cardSprites[10] },
             { (CardType.BlocksB, CardVariant.box), cardSprites[11] },
+            { (CardType.Train, CardVariant.toy), cardSprites[12] },
+            { (CardType.Train, CardVariant.box), cardSprites[13] },
+            { (CardType.Car, CardVariant.toy), cardSprites[14] },
+            { (CardType.Car, CardVariant.box), cardSprites[15] },
         };
     }
 
     void Start()
     {
+        gridWidth = GameSettings.GridWidth;
+        gridHeight = GameSettings.GridHeight;
+        maxAllowed = GameSettings.MaxAllowed;
+
+
         musicVolumeSlider.onValueChanged.AddListener(AudioManager.Instance.SetMusicVolume);
         SFXVolumeSlider.onValueChanged.AddListener(AudioManager.Instance.SetSFXVolume);
         if (AudioManager.Instance != null)
@@ -85,6 +96,7 @@ public class GridManager : MonoBehaviour
         }
 
         int totalSlots = gridWidth * gridHeight;
+        Debug.Log(gridHeight+" "+gridWidth);
         slotTransforms = new Transform[totalSlots];
         cardInstances = new GameObject[totalSlots];
 
@@ -136,13 +148,8 @@ public class GridManager : MonoBehaviour
                 gameOver = true;
                 Debug.Log("Game Over — no slots available.");
 
-                if (gameOverText != null)
-                    gameOverText.SetActive(true);
-
-                yield return new WaitForSeconds(3f);
-
-                if (sceneSwitcher != null)
-                    sceneSwitcher.LoadSceneByIndex(0);
+                if (gameOverPanel != null)
+                    gameOverPanel.SetActive(true);
 
                 yield break;
             }
@@ -178,7 +185,9 @@ public class GridManager : MonoBehaviour
 
         cardInstances[slotIndex] = cardGO;
 
-        int maxUnlockedTypes = Mathf.Min(2 + score / 5, System.Enum.GetNames(typeof(CardType)).Length);
+        int gameUnlockedTypes = Mathf.Min(2 + score / 8, System.Enum.GetNames(typeof(CardType)).Length);
+        int maxUnlockedTypes = Mathf.Min(gameUnlockedTypes, maxAllowed);
+
         CardType type = (CardType)Random.Range(0, maxUnlockedTypes);
 
         CardVariant variant = (CardVariant)Random.Range(0, 2);

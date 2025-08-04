@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public enum CardType { Teddy, Doll, Clown, Blocks, JackBox, BlocksB }
+public enum CardType { Teddy, Doll, Clown, Blocks, JackBox, BlocksB, Train, Car }
 public enum CardVariant { toy, box }
 
 public class Card : MonoBehaviour

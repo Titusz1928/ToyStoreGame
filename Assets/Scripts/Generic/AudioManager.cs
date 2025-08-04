@@ -40,6 +40,8 @@ public class AudioManager : MonoBehaviour
         sfxSource.loop = false;
         sfxSource.playOnAwake = false;
 
+        LoadSettings();
+
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
@@ -117,6 +119,8 @@ public class AudioManager : MonoBehaviour
         {
             musicSource.volume = currentVolume;
         }
+        SaveSettings();
+
         //Debug.Log($"Slider Value: {volume}, CurrentVolume: {currentVolume}, MusicSource.volume: {musicSource.volume}, IsMuted: {musicSource.mute}");
 
     }
@@ -125,6 +129,7 @@ public class AudioManager : MonoBehaviour
     {
         sfxVolume = Mathf.Clamp01(volume);
         // Optional: Apply volume to existing looped SFX (not relevant for OneShots)
+        SaveSettings();
     }
 
     public float GetSFXVolume()
@@ -135,6 +140,8 @@ public class AudioManager : MonoBehaviour
     public void ToggleSFX(bool isOn)
     {
         isSFXOn = isOn;
+        SaveSettings();
+
     }
 
     public bool IsSFXOn()
@@ -149,6 +156,8 @@ public class AudioManager : MonoBehaviour
         isMusicOn = isOn;
         if (musicSource != null)
             musicSource.mute = !isOn;
+
+        SaveSettings();
     }
 
     public float GetCurrentVolume()
@@ -165,4 +174,30 @@ public class AudioManager : MonoBehaviour
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
+
+    //SAVING SETTINGS
+
+    private void SaveSettings()
+    {
+        PlayerPrefs.SetFloat("MusicVolume", currentVolume);
+        PlayerPrefs.SetFloat("SFXVolume", sfxVolume);
+        PlayerPrefs.SetInt("IsMusicOn", isMusicOn ? 1 : 0);
+        PlayerPrefs.SetInt("IsSFXOn", isSFXOn ? 1 : 0);
+        PlayerPrefs.Save();
+    }
+
+    private void LoadSettings()
+    {
+        currentVolume = PlayerPrefs.GetFloat("MusicVolume", 1f);
+        sfxVolume = PlayerPrefs.GetFloat("SFXVolume", 1f);
+        isMusicOn = PlayerPrefs.GetInt("IsMusicOn", 1) == 1;
+        isSFXOn = PlayerPrefs.GetInt("IsSFXOn", 1) == 1;
+
+        if (musicSource != null)
+        {
+            musicSource.volume = currentVolume;
+            musicSource.mute = !isMusicOn;
+        }
+    }
+
 }

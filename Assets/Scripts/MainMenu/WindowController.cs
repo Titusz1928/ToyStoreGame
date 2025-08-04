@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Tabmenu.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,11 +8,16 @@ using UnityEngine.UI;
 public class WindowController : MonoBehaviour
 {
     [SerializeField] private GameObject settingsPanel;
+    [SerializeField] private GameObject newGamePanel;
 
     public Slider musicVolumeSlider;
     public Toggle musicVolumeToggle;
+
     public Slider SFXVolumeSlider;
     public Toggle SFXVolumeToggle;
+
+    public Slider gameAreaSlider;
+    public Slider cardNumberSlider;
 
     private void Start()
     {
@@ -32,16 +38,38 @@ public class WindowController : MonoBehaviour
             SFXVolumeToggle.isOn = !AudioManager.Instance.IsSFXOn();
 
         }
+
+        gameAreaSlider.onValueChanged.AddListener(NewGameManager.Instance.SetGameArea);
+        cardNumberSlider.onValueChanged.AddListener(NewGameManager.Instance.SetCardNumber);
+
     }
 
     public void OpenSettingsPanel()
     {
         settingsPanel.SetActive(true);
+        newGamePanel.SetActive(false);
 
+    }
+
+    public void OpenNewGamePanel()
+    {
+        settingsPanel.SetActive(false);
+        newGamePanel.SetActive(true);
+
+        GameSettings.GridWidth = Mathf.RoundToInt(7);
+        GameSettings.GridHeight = Mathf.RoundToInt(5);
+
+        // Force tab index 0 to be active
+        var tabMenu = newGamePanel.GetComponentInChildren<TabMenu>();
+        if (tabMenu != null)
+        {
+            tabMenu.JumpToPage(0);
+        }
     }
 
     public void OpenMainMenuPanel()
     {
         settingsPanel.SetActive(false);
+        newGamePanel.SetActive(false);
     }
 }
