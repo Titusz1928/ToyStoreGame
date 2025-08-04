@@ -31,6 +31,8 @@ public class GridManager : MonoBehaviour
     //GAME OVER
     public SceneSwitcher sceneSwitcher;
     public GameObject gameOverPanel;
+    public TextMeshProUGUI currentHighScoreText;
+    public GameObject newHighScoreText;
 
     private Coroutine spawnRoutine;
     private bool isPaused = false;
@@ -45,6 +47,7 @@ public class GridManager : MonoBehaviour
     [SerializeField] private AudioClip grabSound;
     [SerializeField] private AudioClip placeSound;
     [SerializeField] private AudioClip gameOverSound;
+    [SerializeField] private AudioClip highscoreSound;
 
 
     void Awake()
@@ -77,6 +80,8 @@ public class GridManager : MonoBehaviour
         gridHeight = GameSettings.GridHeight;
         maxAllowed = GameSettings.MaxAllowed;
 
+        string gameCode="Gametype_" + GameSettings.GridHeight.ToString() + "rows" + GameSettings.MaxAllowed.ToString() + "cards";
+        currentHighScoreText.text= "Rekord: "+PlayerPrefs.GetInt(gameCode, 0).ToString();
 
         musicVolumeSlider.onValueChanged.AddListener(AudioManager.Instance.SetMusicVolume);
         SFXVolumeSlider.onValueChanged.AddListener(AudioManager.Instance.SetSFXVolume);
@@ -144,7 +149,29 @@ public class GridManager : MonoBehaviour
             }
             if (freeSlots.Count == 0)
             {
-                AudioManager.Instance.PlaySoundEffect(gameOverSound);
+
+
+                string gameCode = "Gametype_"+GameSettings.GridHeight.ToString()+"rows"+GameSettings.MaxAllowed.ToString()+"cards";
+                //Debug.Log(gameCode);
+
+                int storedHighScore = PlayerPrefs.GetInt(gameCode, 0);
+                Debug.Log("storedhighscore for " + gameCode + " =" + storedHighScore);
+
+                if (score > storedHighScore)
+                {
+                    newHighScoreText.SetActive(true);
+                    PlayerPrefs.SetInt(gameCode, score);
+                    PlayerPrefs.Save();
+                    Debug.Log("New high score saved: " + score);
+                    AudioManager.Instance.PlaySoundEffect(highscoreSound);
+                }
+                else{
+                    Debug.Log("No new high score: " + score);
+                    AudioManager.Instance.PlaySoundEffect(gameOverSound);
+                }
+
+
+
                 gameOver = true;
                 Debug.Log("Game Over — no slots available.");
 

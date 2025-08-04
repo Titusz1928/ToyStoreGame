@@ -8,6 +8,7 @@ using UnityEngine.UI;
 public class WindowController : MonoBehaviour
 {
     [SerializeField] private GameObject settingsPanel;
+    [SerializeField] private GameObject highScorePanel;
     [SerializeField] private GameObject newGamePanel;
 
     public Slider musicVolumeSlider;
@@ -46,13 +47,23 @@ public class WindowController : MonoBehaviour
 
     public void OpenSettingsPanel()
     {
-        settingsPanel.SetActive(true);
         newGamePanel.SetActive(false);
+        highScorePanel.SetActive(false);
+        settingsPanel.SetActive(true);
+
+    }
+
+    public void OpenHighScoresPanel()
+    {
+        settingsPanel.SetActive(false);
+        newGamePanel.SetActive(false);
+        highScorePanel.SetActive(true);
 
     }
 
     public void OpenNewGamePanel()
     {
+        highScorePanel.SetActive(false);
         settingsPanel.SetActive(false);
         newGamePanel.SetActive(true);
 
@@ -69,7 +80,19 @@ public class WindowController : MonoBehaviour
 
     public void OpenMainMenuPanel()
     {
+        highScorePanel.SetActive(false);
         settingsPanel.SetActive(false);
         newGamePanel.SetActive(false);
+    }
+
+    public void QuitGame()
+    {
+        Debug.Log("Quitting the game...");
+        Application.Quit();
+
+        //#if UNITY_EDITOR
+        //        // For unity editor
+        //        UnityEditor.EditorApplication.isPlaying = false;
+        //#endif
     }
 }
